@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="commonsCache">
+  	<!--当Cache达到预定设定的最大容量时，按照最少使用的原则将使用频率最少的对象从缓存中清除 -->
+	<cacheModel id="userCache" type="LRU">
+	   <flushInterval hours="24"/>
+	   <flushOnExecute statement="updateUser"/>
+	   <property name="size" value="1000"/>
+	</cacheModel>
+	
+</sqlMap>

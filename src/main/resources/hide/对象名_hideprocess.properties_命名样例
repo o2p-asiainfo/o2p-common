@@ -1,0 +1,4 @@
+#fieldName=methodName
+#method:hiddenNickName,hiddenMobile,hiddenIDCard,hiddenBirthday
+userName=hiddenNickName
+phoneNum=hiddenMobile

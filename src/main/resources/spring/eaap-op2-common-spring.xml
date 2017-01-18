@@ -1,0 +1,92 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       " >
+
+	<context:component-scan base-package="com.ailk.eaap.o2p"/>
+	<!-- 缓存相关配置 -->
+    <!-- memcached相关的配置 -->
+	<bean  id="xMemcachedClientFactoryBean"   name="o2pCommons.runtimeMemcachedClient" class="com.ailk.eaap.o2p.common.cache.XmemcacheFactoryBeanExtend" destroy-method="shutdown">
+		<!-- Distributed strategy -->
+		<property name="sessionLocator">
+			<bean class="net.rubyeye.xmemcached.impl.KetamaMemcachedSessionLocator"></bean>
+		</property>
+		<!-- ByteBuffer allocator -->
+		<property name="bufferAllocator">
+			<bean class="net.rubyeye.xmemcached.buffer.SimpleBufferAllocator"></bean>
+		</property>
+		<property name="cacheMode"><value>${cacheMode}</value></property>
+	</bean>
+	<!-- javacache -->
+    <bean name="o2pCommons.javacached" class="java.util.concurrent.ConcurrentHashMap"/>
+	<!-- redis -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
+        <property name="connectionFactory"   ref="redisConnectionFactory" />  
+    </bean>
+	<bean id="redis" class="com.ailk.eaap.o2p.common.cache.Redis">
+		<property name="redisTemplate"   ref="redisTemplate" />
+	</bean>
+	<!-- ehcache
+	<bean id="o2pCommons.ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+	
+	<bean id="o2pCommons.ehcacheBackend" class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+		<property name="cacheManager">
+			<ref bean="o2pCommons.ehcacheManager"/>
+		</property>
+		<property name="maxElementsInMemory">
+			<value>200000</value>
+		</property>
+		<property name="overflowToDisk">
+			<value>false</value>
+		</property>
+		<property name="eternal">
+			<value>true</value>
+		</property>
+		<property name="timeToLive">
+			<value>90000000</value>
+		</property>
+		<property name="timeToIdle">
+			<value>90000000</value>
+		</property>
+	</bean> -->
+	
+	
+	<!-- 数据源缓存对象，用来获取数据源Map和数据源路由Map -->
+	<bean name="datasourceMapLookup" class="com.ailk.eaap.o2p.common.jdbc.datasource.DataSourceCache">
+		<property name="cacheFactory" ref="cacheFactory"></property>
+	</bean>
+	
+	<!-- 数据源路由类，根据路由规则获取数据源name -->
+	<bean name="multiDataSourceRoute" class="com.ailk.eaap.o2p.common.jdbc.datasource.MultiDataSourceRouteImpl" />
+	
+	<!-- Multiple data sources -->
+	<bean name="multiDatasource" class="com.linkage.rainbow.dao.MultiDataSource">
+		<property name="datasourceMap" ref="datasourceMapLookup"></property>
+		<property name="multiDataSourceRoute" ref="multiDataSourceRoute"></property>
+	</bean>
+	 
+	<!-- factory -->
+	<bean name="cacheFactory" class="com.ailk.eaap.o2p.common.cache.CacheFactory">
+		<property name="cacheMode"><value>${cacheMode}</value></property>
+		<property name="localCacheMode"><value>${localCacheMode}</value></property>
+	  <property name="javaCache">
+	     <ref bean="o2pCommons.javacached"/>
+	  </property><!-- 
+	  <property name="ehcache">
+	     <ref bean="o2pCommons.ehcacheBackend"/>
+	  </property>-->
+	  <property name="runTimeMemcachedClient">
+	     <ref bean="o2pCommons.runtimeMemcachedClient"/>
+	  </property>
+	  <property name="redis">
+	     <ref bean="redis"/>
+	  </property>
+	</bean>
+</beans>

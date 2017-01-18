@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+       					http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	
+	<!-- 多语言国际化DAO -->
+	<bean id="baseDaoImpl"
+		class="com.asiainfo.integration.o2p.international.dao.impl.BaseDaoImpl">
+		<property name="sqlMapDao"><ref bean="commonIBatisSqlMapDAO"/></property>
+	</bean>
+	
+	<!-- memcached相关的配置 -->
+	<bean id="xMemcachedClientFactoryBean"  name="o2pCommons.runtimeMemcachedClient" class="net.rubyeye.xmemcached.utils.XMemcachedClientFactoryBean" destroy-method="shutdown">
+		<property name="servers">
+			<value>${memcache.runtimeserver}</value>
+		</property>
+		<!-- server's weights -->
+		<property name="weights">
+			<list>
+				<value>1</value>
+				<value>1</value>
+			</list> 
+		</property>
+		
+		<!-- nio connection pool size -->
+		<property name="connectionPoolSize"><value>${memcache.runtimeconnectionPoolSize}</value></property>
+		<!-- Distributed strategy -->
+		<property name="sessionLocator">
+			<bean class="net.rubyeye.xmemcached.impl.KetamaMemcachedSessionLocator"></bean>
+		</property>
+		
+		<!-- ByteBuffer allocator -->
+		<property name="bufferAllocator">
+			<bean class="net.rubyeye.xmemcached.buffer.SimpleBufferAllocator"></bean>
+		</property>
+		<!-- Failure mode -->
+		<property name="failureMode"><value>${memcache.runtimefailureMode}</value></property>
+		<property name="opTimeout"><value>${memcache.runtimeOpTimeout}</value></property>
+	</bean>
+	
+</beans>

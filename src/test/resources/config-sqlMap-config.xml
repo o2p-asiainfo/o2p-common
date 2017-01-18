@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- debug环境下，将其设为false. 正式运行时应设为true,启用缓存 -->
+	<settings cacheModelsEnabled="false" lazyLoadingEnabled="false" enhancementEnabled="true"
+		useStatementNamespaces="true" maxSessions="64" maxTransactions="15"
+		maxRequests="128" />
+	<sqlMap resource="ibatis/o2pCommonsCache.xml" />
+
+</sqlMapConfig>
